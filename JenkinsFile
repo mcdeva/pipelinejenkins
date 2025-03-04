@@ -2,14 +2,48 @@ pipeline {
     agent any
 
     stages {
-        stage('Hello') {
+        stage('Integrate Coding') {
             steps {
-                echo 'Hello World'
+                echo 'Integrate Coding'
             }
         }
-        stage('Try another one') {
+        stage('Deploy to environment') {
             steps {
-                echo 'Test new stage'
+                echo 'Implement deployment...'
+            }
+        }
+        stage('Pull Automate') {
+            steps {
+                checkout scmGit(branches: [[name: '*/main']], extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: '/Users/mcdeva/Desktop/automate']], userRemoteConfigs: [[credentialsId: '7101d530-0670-4807-93e0-5b62957e43e5', url: 'https://github.com/mcdeva/automateRobot']])
+            }
+        }
+        stage('Automate') {
+            parallel {
+                stage('Test Login') {
+                    steps {
+                        sh '/Users/mcdeva/env_python/robot7/bin/robot -d /Users/mcdeva/Desktop/automate/Result -o output-login.xml -i TestLogin /Users/mcdeva/Desktop/automate/Testsuites/login.robot'
+                    }
+                }
+                stage('Test API') {
+                    steps {
+                        sh '/Users/mcdeva/env_python/robot7/bin/robot -d /Users/mcdeva/Desktop/automate/Result -o output-api.xml /Users/mcdeva/Desktop/automate/Testsuites/api.robot'
+                    }
+                }
+            }
+        }
+        stage('Read result') {
+            steps {
+                echo 'read result'
+            }
+        }
+        stage('Summary Result') {
+            steps {
+                echo 'Notification Result'
+            }
+        }
+        stage('robot result') {
+            steps {
+                robot archiveDirName: 'robot-plugin', outputPath: '/Users/mcdeva/Desktop/automate/Result', overwriteXAxisLabel: ''
             }
         }
     }
